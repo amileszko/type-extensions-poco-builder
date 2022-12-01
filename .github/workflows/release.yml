@@ -28,7 +28,7 @@ jobs:
       uses: damienaicheh/extract-version-from-tag-action@v1.0.0
 
     - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.5
+      uses: NuGet/setup-nuget@v1.1.1
 
     - name: Restore dependencies
       run: nuget restore $PROJECT
