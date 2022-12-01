@@ -3,7 +3,7 @@
 ### What is POCO Builder?
 
 POCO builder is a light-weight library that creates POCO (Plain Old CLR Object) type at runtime from any compile time definied type. 
-All properies definied in POCO type has automatically created getters and setters and can be extended with attributes just like the type itself.
+All properies defined in POCO type has automatically created getters and setters and can be extended with attributes just like the type itself.
 
 ### How do I get started?
 
