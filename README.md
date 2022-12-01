@@ -1,5 +1,8 @@
 # POCO Builder
 
+[![CI](https://github.com/amileszko/type-extensions-poco-builder/actions/workflows/release.yml/badge.svg)](https://github.com/amileszko/type-extensions-poco-builder/actions/workflows/release.yml)
+[![NuGet](http://img.shields.io/nuget/vpre/TypeExtensions.PocoBuilder.svg?label=NuGet)](https://www.nuget.org/packages/TypeExtensions.PocoBuilder)
+
 ### What is POCO Builder?
 
 POCO builder is a light-weight library that creates POCO (Plain Old CLR Object) type at runtime from any compile time definied type. 
