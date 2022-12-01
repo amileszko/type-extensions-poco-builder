@@ -11,6 +11,10 @@ jobs:
     env:
       BUILD_CONFIG: 'Release'
       PROJECT: 'TypeExtensions.PocoBuilder.csproj'
+      
+    defaults:
+      run:
+        working-directory: ./src/TypeExtensions.PocoBuilder
 
     runs-on: ubuntu-latest
 
