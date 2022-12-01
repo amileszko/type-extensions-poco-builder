@@ -39,7 +39,7 @@ jobs:
       run: dotnet restore $PROJECT
 
     - name: Build
-      run: dotnet build $PROJECT --configuration $BUILD_CONFIG -p:Version=format('{{{0}.{1}.{2}}}', $MAJOR, $MINOR, $PATH) --no-restore
+      run: dotnet build $PROJECT --configuration $BUILD_CONFIG -p:Version=${{format('{0}.{1}.{2}', $MAJOR, $MINOR, $PATH)}} --no-restore
 
     - name: Run tests
       run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
