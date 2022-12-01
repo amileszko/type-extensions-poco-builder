@@ -43,3 +43,11 @@ var propertyInfo = pocoType.GetRuntimeProperty("Property");
 ```
 
 You can check out more examples in test project.
+
+### Contribution
+
+Welcome to join in and feel free to contribute by creating an Issue or Pull Request.
+
+### License
+
+The project is under [MIT license](https://opensource.org/licenses/MIT).
