@@ -1,0 +1,8 @@
+*.suo
+*.user
+.vs
+[Bb]in
+[Oo]bj
+[Pp]ackages
+.idea
+.DS_Store
