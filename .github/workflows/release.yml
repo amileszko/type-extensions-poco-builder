@@ -39,13 +39,13 @@ jobs:
       run: dotnet restore $PROJECT
 
     - name: Build
-      run: dotnet build $PROJECT --configuration $BUILD_CONFIG -p:Version=${{format('{0}.{1}.{2}', env.MAJOR, env.MINOR, env.PATCH)}} --no-restore
+      run: dotnet build $PROJECT --configuration $BUILD_CONFIG --no-restore
 
     - name: Run tests
       run: dotnet test --configuration $BUILD_CONFIG --no-restore --no-build --verbosity normal
       
     - name: Pack
-      run: dotnet pack --configuration $BUILD_CONFIG --no-restore --no-build --verbosity normal
+      run: dotnet pack --configuration $BUILD_CONFIG -p:Version=${{format('{0}.{1}.{2}', env.MAJOR, env.MINOR, env.PATCH)}} --no-restore --no-build --verbosity normal
       
     - name: Publish to NuGet
       run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}} -SkipDuplicate
