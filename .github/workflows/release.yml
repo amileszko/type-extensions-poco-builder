@@ -38,17 +38,9 @@ jobs:
 
     - name: Extract version from tag
       uses: damienaicheh/extract-version-from-tag-action@v1.0.0
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6
 
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.1.1
-
-    - name: Restore dependencies
-      run: dotnet restore $PROJECT
 
     - name: Build
       run: dotnet build $PROJECT --configuration $BUILD_CONFIG -p:Version=${{format('{0}.{1}.{2}', env.MAJOR, env.MINOR, env.PATCH)}} --no-restore
