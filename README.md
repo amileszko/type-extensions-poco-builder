@@ -44,7 +44,17 @@ pocoTypeBuilder
     .Property(type => type.Property,
         propertyBuilder => propertyBuilder.AddAttribute<TestAttribute>());
         
-//Build POCO type
+/*
+Build POCO type.
+Created POCO type class looks like this:
+
+[TestAttribute]
+public class TestClass
+{
+   [TestAttribute]
+   public string Property { get; set; }
+}
+*/
 var pocoType = pocoTypeBuilder.Build();
 
 //Access POCO type property through reflection.
