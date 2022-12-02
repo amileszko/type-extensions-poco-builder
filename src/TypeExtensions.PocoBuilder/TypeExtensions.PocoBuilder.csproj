@@ -9,6 +9,7 @@
         <PackageTags>csharp;dotnet;poco;csharp-library;dotnet-library;poco-libraries;poco-generator</PackageTags>
         <PackageProjectUrl>https://github.com/amileszko/type-extensions-poco-builder</PackageProjectUrl>
         <RepositoryUrl>https://github.com/amileszko/type-extensions-poco-builder.git</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
 </Project>
