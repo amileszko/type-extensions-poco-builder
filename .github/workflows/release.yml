@@ -47,5 +47,8 @@ jobs:
     - name: Pack
       run: dotnet pack --configuration $BUILD_CONFIG --no-restore --no-build --verbosity normal
       
-    - name: Publish
-      run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
+    - name: Publish to NuGet
+      run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}} -SkipDuplicate
+      
+    - name: Publish to GitHub
+      run: nuget push **\*.nupkg -Source 'https://nuget.pkg.github.com/amileszko/index.json' -ApiKey ${{secrets.MY_GITHUB_PAT}} -SkipDuplicate
