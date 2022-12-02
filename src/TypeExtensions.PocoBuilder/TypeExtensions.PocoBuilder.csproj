@@ -4,6 +4,10 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Authors>Amadeusz Mileszko</Authors>
+        <Description>Light-weight library that creates POCO (Plain Old CLR Object) type at runtime from any compile time defined type.</Description>
+        <PackageTags>csharp;dotnet;poco;csharp-library;dotnet-library;poco-libraries;poco-generator</PackageTags>
+        <RepositoryUrl>https://github.com/amileszko/type-extensions-poco-builder.git</RepositoryUrl>
     </PropertyGroup>
 
 </Project>
