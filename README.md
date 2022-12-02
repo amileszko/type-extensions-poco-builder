@@ -2,6 +2,12 @@
 
 [![CI](https://github.com/amileszko/type-extensions-poco-builder/actions/workflows/release.yml/badge.svg)](https://github.com/amileszko/type-extensions-poco-builder/actions/workflows/release.yml)
 [![NuGet](http://img.shields.io/nuget/vpre/TypeExtensions.PocoBuilder.svg?label=NuGet)](https://www.nuget.org/packages/TypeExtensions.PocoBuilder)
+\
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=amileszko_type-extensions-poco-builder&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=amileszko_type-extensions-poco-builder)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=amileszko_type-extensions-poco-builder&metric=coverage)](https://sonarcloud.io/summary/new_code?id=amileszko_type-extensions-poco-builder)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=amileszko_type-extensions-poco-builder&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=amileszko_type-extensions-poco-builder)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=amileszko_type-extensions-poco-builder&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=amileszko_type-extensions-poco-builder)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=amileszko_type-extensions-poco-builder&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=amileszko_type-extensions-poco-builder)
 
 ### What is POCO Builder?
 
