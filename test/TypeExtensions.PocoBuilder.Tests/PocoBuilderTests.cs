@@ -46,6 +46,8 @@ public class TestAttributeWithParameters : Attribute
 {
     public string Parameter { get; }
 
+    public string PropertyParameter { get; set; } = null!;
+
     public TestAttributeWithParameters(string parameter)
     {
         Parameter = parameter;
@@ -211,16 +213,27 @@ public class PocoTypeBuilderTests
             .AddAttribute<TestAttributeWithParameters>(
                 new object[]
                 {
-                    "value"
+                    "value1"
+                },
+                new Dictionary<string, object>
+                {
+                    {
+                        "PropertyParameter", "value2"
+                    }
                 })
             .Build();
 
         //Assert
-        Attribute.GetCustomAttribute(
-                pocoType,
-                typeof(TestAttributeWithParameters))
+        var attribute = Attribute.GetCustomAttribute(
+            pocoType,
+            typeof(TestAttributeWithParameters)) as TestAttributeWithParameters;
+
+        attribute
             .Should()
             .NotBeNull();
+
+        attribute!.Parameter.Should().Be("value1");
+        attribute.PropertyParameter.Should().Be("value2");
     }
 
     [Fact]
@@ -236,16 +249,27 @@ public class PocoTypeBuilderTests
                 propertyBuilder => propertyBuilder.AddAttribute<TestAttributeWithParameters>(
                     new object[]
                     {
-                        "value"
+                        "value1"
+                    },
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "PropertyParameter", "value2"
+                        }
                     }))
             .Build();
 
         //Assert
-        Attribute.GetCustomAttribute(
-                pocoType.GetRuntimeProperty("Property")!,
-                typeof(TestAttributeWithParameters))
+        var attribute = Attribute.GetCustomAttribute(
+            pocoType.GetRuntimeProperty("Property")!,
+            typeof(TestAttributeWithParameters)) as TestAttributeWithParameters;
+
+        attribute
             .Should()
             .NotBeNull();
+
+        attribute!.Parameter.Should().Be("value1");
+        attribute.PropertyParameter.Should().Be("value2");
     }
 
     [Fact]
@@ -272,28 +296,75 @@ public class PocoTypeBuilderTests
     }
 
     [Fact]
-    public void Does_not_add_attribute_without_parameters_to_poco_type_property_when_parameters_are_set()
+    public void Does_not_add_attribute_with_parameters_to_poco_type_when_parameters_are_not_set()
     {
         //Arrange
         var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
 
         //Act
         var addingAttributeAction = () => pocoTypeBuilder
-            .Property(
-                instance => instance.Property,
-                propertyBuilder => propertyBuilder.AddAttribute<TestAttributeWithoutParameters>(
-                    new object[]
-                    {
-                        "value"
-                    }));
+            .AddAttribute<TestAttributeWithParameters>();
 
         //Assert
         addingAttributeAction.Should()
             .Throw<ArgumentException>()
             .WithMessage(
-                "Attribute of type: TestAttributeWithoutParameters "
-                + "has no constructor with parameters of "
-                + "types: String. (Parameter 'attributeCtorParams')");
+                "Attribute of type: TestAttributeWithParameters "
+                + "has no constructor without parameters. (Parameter 'attributeCtorParams')");
+    }
+
+    [Fact]
+    public void Does_not_add_attribute_with_parameters_to_poco_type_when_property_parameter_does_not_exist()
+    {
+        //Arrange
+        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
+
+        //Act
+        var addingAttributeAction = () => pocoTypeBuilder
+            .AddAttribute<TestAttributeWithParameters>(
+                new object[]
+                {
+                    "value"
+                },
+                new Dictionary<string, object>
+                {
+                    {
+                        "Test", "value2"
+                    }
+                });
+
+        //Assert
+        addingAttributeAction.Should()
+            .Throw<ArgumentException>()
+            .WithMessage(
+                "Attribute of type: TestAttributeWithParameters has no properties "
+                + "with names: Test. (Parameter 'attributePropertiesValues')");
+    }
+
+    [Fact]
+    public void Does_not_add_attribute_with_parameters_to_poco_type_when_property_parameter_value_has_invalid_type()
+    {
+        //Arrange
+        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
+
+        //Act
+        var addingAttributeAction = () => pocoTypeBuilder
+            .AddAttribute<TestAttributeWithParameters>(
+                new object[]
+                {
+                    "value"
+                },
+                new Dictionary<string, object>
+                {
+                    {
+                        "PropertyParameter", 1
+                    }
+                });
+
+        //Assert
+        addingAttributeAction.Should()
+            .Throw<ArgumentException>()
+            .WithMessage("Constant does not match the defined type.");
     }
 
     [Fact]

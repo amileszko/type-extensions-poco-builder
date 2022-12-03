@@ -19,10 +19,13 @@ public sealed class PocoTypeBuilder<TBaseType>
         typeBuilder = CreateTypeBuilder(pocoTypeName);
     }
 
-    public PocoTypeBuilder<TBaseType> AddAttribute<TAttribute>(object[]? attributeCtorParams = null)
+    public PocoTypeBuilder<TBaseType> AddAttribute<TAttribute>(
+        object[]? attributeCtorParams = null,
+        Dictionary<string, object>? attributePropertiesValues = null)
         where TAttribute : Attribute
     {
-        typeBuilder.SetCustomAttribute(AttributeUtils.CreateCustomAttributeBuilder<TAttribute>(attributeCtorParams));
+        typeBuilder.SetCustomAttribute(
+            AttributeUtils.CreateCustomAttributeBuilder<TAttribute>(attributeCtorParams, attributePropertiesValues));
 
         return this;
     }

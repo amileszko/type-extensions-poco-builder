@@ -12,11 +12,13 @@ public sealed class PocoTypePropertyBuilder
         this.propertyBuilder = propertyBuilder;
     }
 
-    public PocoTypePropertyBuilder AddAttribute<TAttribute>(object[]? attributeCtorParams = null)
+    public PocoTypePropertyBuilder AddAttribute<TAttribute>(
+        object[]? attributeCtorParams = null,
+        Dictionary<string, object>? attributePropertiesValues = null)
         where TAttribute : Attribute
     {
         propertyBuilder.SetCustomAttribute(
-            AttributeUtils.CreateCustomAttributeBuilder<TAttribute>(attributeCtorParams));
+            AttributeUtils.CreateCustomAttributeBuilder<TAttribute>(attributeCtorParams, attributePropertiesValues));
 
         return this;
     }
