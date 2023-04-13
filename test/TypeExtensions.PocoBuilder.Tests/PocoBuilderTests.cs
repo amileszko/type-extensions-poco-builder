@@ -71,6 +71,31 @@ public class PocoTypeBuilderTests
     }
 
     [Fact]
+    public void Builds_poco_type()
+    {
+        //Arrange
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
+
+        //Act
+        var pocoType = pocoTypeBuilder
+            .Property("Property", typeof(string))
+            .Build();
+
+        //Assert
+        pocoType.Should().NotBeNull();
+        pocoType.Name.Should().Be("PocoType");
+
+        var property = pocoType.GetRuntimeProperty("Property");
+
+        property
+            .Should()
+            .NotBeNull();
+
+        property!.Name.Should().Be("Property");
+        property.PropertyType.Should().Be(typeof(string));
+    }
+
+    [Fact]
     public void Builds_poco_type_from_public_type()
     {
         //Arrange
@@ -83,10 +108,16 @@ public class PocoTypeBuilderTests
 
         //Assert
         pocoType.Should().NotBeNull();
+        pocoType.Name.Should().Be("TestClass");
 
-        pocoType.GetRuntimeProperty("Property")
+        var property = pocoType.GetRuntimeProperty("Property");
+
+        property
             .Should()
             .NotBeNull();
+
+        property!.Name.Should().Be("Property");
+        property.PropertyType.Should().Be(typeof(string));
     }
 
     [Fact]
@@ -102,10 +133,16 @@ public class PocoTypeBuilderTests
 
         //Assert
         pocoType.Should().NotBeNull();
+        pocoType.Name.Should().Be("SealedTestClass");
 
-        pocoType.GetRuntimeProperty("Property")
+        var property = pocoType.GetRuntimeProperty("Property");
+
+        property
             .Should()
             .NotBeNull();
+
+        property!.Name.Should().Be("Property");
+        property.PropertyType.Should().Be(typeof(string));
     }
 
     [Fact]
@@ -121,10 +158,16 @@ public class PocoTypeBuilderTests
 
         //Assert
         pocoType.Should().NotBeNull();
+        pocoType.Name.Should().Be("InternalTestClass");
 
-        pocoType.GetRuntimeProperty("Property")
+        var property = pocoType.GetRuntimeProperty("Property");
+
+        property
             .Should()
             .NotBeNull();
+
+        property!.Name.Should().Be("Property");
+        property.PropertyType.Should().Be(typeof(string));
     }
 
     [Fact]
@@ -140,14 +183,20 @@ public class PocoTypeBuilderTests
 
         //Assert
         pocoType.Should().NotBeNull();
+        pocoType.Name.Should().Be("PrivateTestClass");
 
-        pocoType.GetRuntimeProperty("Property")
+        var property = pocoType.GetRuntimeProperty("Property");
+
+        property
             .Should()
             .NotBeNull();
+
+        property!.Name.Should().Be("Property");
+        property.PropertyType.Should().Be(typeof(string));
     }
 
     [Fact]
-    public void Builds_poco_type_with_custom_name()
+    public void Builds_poco_type_from_type_with_custom_name()
     {
         //Arrange
         const string pocoTypeCustomName = "CustomName";
@@ -166,7 +215,7 @@ public class PocoTypeBuilderTests
     public void Adds_attribute_to_poco_type()
     {
         //Arrange
-        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
 
         //Act
         var pocoType = pocoTypeBuilder
@@ -182,7 +231,7 @@ public class PocoTypeBuilderTests
     }
 
     [Fact]
-    public void Adds_attribute_to_poco_type_property()
+    public void Adds_attribute_to_poco_type_typed_property()
     {
         //Arrange
         var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
@@ -203,10 +252,32 @@ public class PocoTypeBuilderTests
     }
 
     [Fact]
+    public void Adds_attribute_to_poco_type_property()
+    {
+        //Arrange
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
+
+        //Act
+        var pocoType = pocoTypeBuilder
+            .Property(
+                "Property",
+                typeof(string),
+                propertyBuilder => propertyBuilder.AddAttribute<TestAttributeWithoutParameters>())
+            .Build();
+
+        //Assert
+        Attribute.GetCustomAttribute(
+                pocoType.GetRuntimeProperty("Property")!,
+                typeof(TestAttributeWithoutParameters))
+            .Should()
+            .NotBeNull();
+    }
+
+    [Fact]
     public void Adds_attribute_with_parameters_to_poco_type()
     {
         //Arrange
-        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
 
         //Act
         var pocoType = pocoTypeBuilder
@@ -237,7 +308,7 @@ public class PocoTypeBuilderTests
     }
 
     [Fact]
-    public void Adds_attribute_with_parameters_to_poco_type_property()
+    public void Adds_attribute_with_parameters_to_poco_type_typed_property()
     {
         //Arrange
         var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
@@ -273,10 +344,47 @@ public class PocoTypeBuilderTests
     }
 
     [Fact]
+    public void Adds_attribute_with_parameters_to_poco_type_property()
+    {
+        //Arrange
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
+
+        //Act
+        var pocoType = pocoTypeBuilder
+            .Property(
+                "Property",
+                typeof(string),
+                propertyBuilder => propertyBuilder.AddAttribute<TestAttributeWithParameters>(
+                    new object[]
+                    {
+                        "value1"
+                    },
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "PropertyParameter", "value2"
+                        }
+                    }))
+            .Build();
+
+        //Assert
+        var attribute = Attribute.GetCustomAttribute(
+            pocoType.GetRuntimeProperty("Property")!,
+            typeof(TestAttributeWithParameters)) as TestAttributeWithParameters;
+
+        attribute
+            .Should()
+            .NotBeNull();
+
+        attribute!.Parameter.Should().Be("value1");
+        attribute.PropertyParameter.Should().Be("value2");
+    }
+
+    [Fact]
     public void Does_not_add_attribute_without_parameters_to_poco_type_when_parameters_are_set()
     {
         //Arrange
-        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
 
         //Act
         var addingAttributeAction = () => pocoTypeBuilder
@@ -299,7 +407,7 @@ public class PocoTypeBuilderTests
     public void Does_not_add_attribute_with_parameters_to_poco_type_when_parameters_are_not_set()
     {
         //Arrange
-        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
 
         //Act
         var addingAttributeAction = () => pocoTypeBuilder
@@ -317,7 +425,7 @@ public class PocoTypeBuilderTests
     public void Does_not_add_attribute_with_parameters_to_poco_type_when_property_parameter_does_not_exist()
     {
         //Arrange
-        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
 
         //Act
         var addingAttributeAction = () => pocoTypeBuilder
@@ -345,7 +453,7 @@ public class PocoTypeBuilderTests
     public void Does_not_add_attribute_with_parameters_to_poco_type_when_property_parameter_value_has_invalid_type()
     {
         //Arrange
-        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
 
         //Act
         var addingAttributeAction = () => pocoTypeBuilder
@@ -371,7 +479,7 @@ public class PocoTypeBuilderTests
     public void Does_not_add_attribute_to_poco_type_when_attribute_is_internal()
     {
         //Arrange
-        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
 
         //Act
         var addingAttributeAction = () => pocoTypeBuilder
@@ -389,7 +497,7 @@ public class PocoTypeBuilderTests
     public void Does_not_add_attribute_to_poco_type_when_attribute_is_private()
     {
         //Arrange
-        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>();
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType");
 
         //Act
         var addingAttributeAction = () => pocoTypeBuilder

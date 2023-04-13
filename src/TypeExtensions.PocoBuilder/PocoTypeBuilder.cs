@@ -5,21 +5,19 @@ using TypeExtensions.PocoBuilder.Utils;
 
 namespace TypeExtensions.PocoBuilder;
 
-public sealed class PocoTypeBuilder<TBaseType>
+public class PocoTypeBuilder
 {
-    private readonly Type baseType;
     private readonly TypeBuilder typeBuilder;
 
     private const MethodAttributes getterSetterAttributes =
         MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig;
 
-    public PocoTypeBuilder(string? pocoTypeName = null)
+    public PocoTypeBuilder(string pocoTypeName)
     {
-        baseType = typeof(TBaseType);
-        typeBuilder = CreateTypeBuilder(pocoTypeName);
+        typeBuilder = TypeBuilderCreator.CreateTypeBuilder(pocoTypeName);
     }
 
-    public PocoTypeBuilder<TBaseType> AddAttribute<TAttribute>(
+    public PocoTypeBuilder AddAttribute<TAttribute>(
         object[]? attributeCtorParams = null,
         Dictionary<string, object>? attributePropertiesValues = null)
         where TAttribute : Attribute
@@ -30,49 +28,29 @@ public sealed class PocoTypeBuilder<TBaseType>
         return this;
     }
 
-    public PocoTypeBuilder<TBaseType> Property<TBaseTypeProperty>(
-        Expression<Func<TBaseType, TBaseTypeProperty>> propertySelector,
+    public PocoTypeBuilder Property(
+        string propertyName,
+        Type propertyType,
         Func<PocoTypePropertyBuilder, PocoTypePropertyBuilder>? pocoPropertyBuilder = null)
     {
-        var propertyName = propertySelector.GetPropertyName();
-
-        var propertyBuilder = baseType.GetRuntimeProperties()
-            .Where(property => property.Name == propertyName)
-            .Select(DefinePropertyBuilder)
-            .Single();
-
-        if (propertyBuilder == null)
-        {
-            throw new ArgumentException(
-                $"Type {baseType.Name} " + $"has no property with name: {propertyName}.",
-                nameof(propertySelector));
-        }
+        var propertyBuilder = DefinePropertyBuilder(propertyName, propertyType);
 
         pocoPropertyBuilder?.Invoke(new PocoTypePropertyBuilder(propertyBuilder));
 
         return this;
     }
 
-    private TypeBuilder CreateTypeBuilder(string? pocoTypeName)
-    {
-        var assemblyName = new AssemblyName("DynamicAssembly");
-        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-        var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name!);
-
-        return moduleBuilder.DefineType(pocoTypeName ?? baseType.Name, TypeAttributes.Public);
-    }
-
-    private PropertyBuilder DefinePropertyBuilder(PropertyInfo propertyInfo)
+    protected PropertyBuilder DefinePropertyBuilder(string propertyName, Type propertyType)
     {
         var field = typeBuilder.DefineField(
-            $"_{propertyInfo.Name.ToCamelCase()}",
-            propertyInfo.PropertyType,
+            $"_{propertyName.ToCamelCase()}",
+            propertyType,
             FieldAttributes.Private);
 
         var property = typeBuilder.DefineProperty(
-            propertyInfo.Name,
+            propertyName,
             PropertyAttributes.HasDefault,
-            propertyInfo.PropertyType,
+            propertyType,
             null);
 
         GenerateGetter(field, property);
@@ -81,7 +59,7 @@ public sealed class PocoTypeBuilder<TBaseType>
         return property;
     }
 
-    private void GenerateGetter(FieldBuilder field, PropertyBuilder propertyBuilder)
+    private void GenerateGetter(FieldInfo field, PropertyBuilder propertyBuilder)
     {
         var getMethodBuilder = typeBuilder.DefineMethod(
             $"get_{propertyBuilder.Name}",
@@ -98,7 +76,7 @@ public sealed class PocoTypeBuilder<TBaseType>
         propertyBuilder.SetGetMethod(getMethodBuilder);
     }
 
-    private void GenerateSetter(FieldBuilder field, PropertyBuilder propertyBuilder)
+    private void GenerateSetter(FieldInfo field, PropertyBuilder propertyBuilder)
     {
         var setMethodBuilder =
             typeBuilder.DefineMethod(
@@ -121,4 +99,37 @@ public sealed class PocoTypeBuilder<TBaseType>
     }
 
     public Type Build() => typeBuilder.CreateTypeInfo()!.AsType();
+}
+
+public sealed class PocoTypeBuilder<TBaseType> : PocoTypeBuilder
+{
+    private readonly Type baseType;
+
+    public PocoTypeBuilder(string? pocoTypeName = null) : base(pocoTypeName ?? typeof(TBaseType).Name)
+    {
+        baseType = typeof(TBaseType);
+    }
+
+    public PocoTypeBuilder<TBaseType> Property<TBaseTypeProperty>(
+        Expression<Func<TBaseType, TBaseTypeProperty>> propertySelector,
+        Func<PocoTypePropertyBuilder, PocoTypePropertyBuilder>? pocoPropertyBuilder = null)
+    {
+        var propertyName = propertySelector.GetPropertyName();
+
+        var propertyBuilder = baseType.GetRuntimeProperties()
+            .Where(property => property.Name == propertyName)
+            .Select(property => DefinePropertyBuilder(property.Name, property.PropertyType))
+            .SingleOrDefault();
+
+        if (propertyBuilder == null)
+        {
+            throw new ArgumentException(
+                $"Type {baseType.Name} has no property with name: {propertyName}.",
+                nameof(propertySelector));
+        }
+
+        pocoPropertyBuilder?.Invoke(new PocoTypePropertyBuilder(propertyBuilder));
+
+        return this;
+    }
 }
