@@ -7,14 +7,14 @@ namespace TypeExtensions.PocoBuilder;
 
 public class PocoTypeBuilder
 {
-    private readonly TypeBuilder typeBuilder;
+    protected readonly TypeBuilder typeBuilder;
 
     private const MethodAttributes getterSetterAttributes =
         MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig;
 
-    public PocoTypeBuilder(string pocoTypeName)
+    public PocoTypeBuilder(string pocoTypeName, string? pocoTypeAssemblyName = null, Type? baseTypeToInheritFrom = null)
     {
-        typeBuilder = TypeBuilderCreator.CreateTypeBuilder(pocoTypeName);
+        typeBuilder = TypeBuilderCreator.CreateTypeBuilder(pocoTypeName, pocoTypeAssemblyName, baseTypeToInheritFrom);
     }
 
     public PocoTypeBuilder AddAttribute<TAttribute>(
@@ -105,7 +105,13 @@ public sealed class PocoTypeBuilder<TBaseType> : PocoTypeBuilder
 {
     private readonly Type baseType;
 
-    public PocoTypeBuilder(string? pocoTypeName = null) : base(pocoTypeName ?? typeof(TBaseType).Name)
+    public PocoTypeBuilder(
+        string? pocoTypeName = null,
+        string? pocoTypeAssemblyName = null,
+        bool inheritFromBaseType = false) : base(
+        pocoTypeName ?? typeof(TBaseType).Name,
+        pocoTypeAssemblyName,
+        inheritFromBaseType ? typeof(TBaseType) : null)
     {
         baseType = typeof(TBaseType);
     }

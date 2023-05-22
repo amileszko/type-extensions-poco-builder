@@ -94,6 +94,30 @@ public class PocoTypeBuilderTests
         property!.Name.Should().Be("Property");
         property.PropertyType.Should().Be(typeof(string));
     }
+    
+    [Fact]
+    public void Builds_poco_type_with_inheritance()
+    {
+        //Arrange
+        var pocoTypeBuilder = new PocoTypeBuilder("PocoType", baseTypeToInheritFrom: typeof(TestClass));
+
+        //Act
+        var pocoType = pocoTypeBuilder
+            .Build();
+
+        //Assert
+        pocoType.Should().NotBeNull();
+        pocoType.IsSubclassOf(typeof(TestClass)).Should().BeTrue();
+
+        var property = pocoType.GetRuntimeProperty("Property");
+
+        property
+            .Should()
+            .NotBeNull();
+
+        property!.Name.Should().Be("Property");
+        property.PropertyType.Should().Be(typeof(string));
+    }
 
     [Fact]
     public void Builds_poco_type_from_public_type()
@@ -196,11 +220,11 @@ public class PocoTypeBuilderTests
     }
 
     [Fact]
-    public void Builds_poco_type_from_type_with_custom_name()
+    public void Builds_poco_type_with_custom_name()
     {
         //Arrange
-        const string pocoTypeCustomName = "CustomName";
-        var pocoTypeBuilder = new PocoTypeBuilder<TestClass>(pocoTypeCustomName);
+        const string pocoTypeCustomName = "TypeName";
+        var pocoTypeBuilder = new PocoTypeBuilder(pocoTypeCustomName);
 
         //Act
         var pocoType = pocoTypeBuilder
@@ -209,6 +233,22 @@ public class PocoTypeBuilderTests
         //Assert
         pocoType.Should().NotBeNull();
         pocoType.Name.Should().Be(pocoTypeCustomName);
+    }
+
+    [Fact]
+    public void Builds_poco_type_custom_assembly_name()
+    {
+        //Arrange
+        const string assemblyCustomName = "AssemblyName";
+        var pocoTypeBuilder = new PocoTypeBuilder("TypeName", pocoTypeAssemblyName: assemblyCustomName);
+
+        //Act
+        var pocoType = pocoTypeBuilder
+            .Build();
+
+        //Assert
+        pocoType.Should().NotBeNull();
+        pocoType.Assembly.GetName().Name.Should().Be(assemblyCustomName);
     }
 
     [Fact]
